@@ -1,0 +1,37 @@
+{
+  "name": "exprest-error-handler",
+  "version": "1.0.0",
+  "description": "A simple, configurable REST error handler for express",
+  "main": "index.js",
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint index.js index_spec.js",
+    "pretest": "npm run-script lint",
+    "test": "./node_modules/.bin/istanbul cover -x **/*_spec.js ./node_modules/.bin/_mocha index_spec.js -- --recursive",
+    "pretest-travis": "npm run-script lint",
+    "test-travis": "node_modules/.bin/istanbul cover -x **/*_spec.js ./node_modules/.bin/_mocha index_spec.js --report lcovonly -- --reporter dot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/slessans/exprest-error-handler.git"
+  },
+  "keywords": [
+    "express",
+    "rest",
+    "error",
+    "handler"
+  ],
+  "author": "Scott Lessans",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/slessans/exprest-error-handler/issues"
+  },
+  "homepage": "https://github.com/slessans/exprest-error-handler#readme",
+  "devDependencies": {
+    "eslint": "1.10.3",
+    "eslint-config-airbnb": "5.0.1",
+    "express": "4.13.4",
+    "istanbul": "0.4.2",
+    "mocha": "2.4.5",
+    "supertest": "1.2.0"
+  }
+}

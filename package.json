@@ -1,6 +1,6 @@
 {
   "name": "exprest-error-handler",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple, configurable REST error handler for express",
   "main": "index.js",
   "scripts": {

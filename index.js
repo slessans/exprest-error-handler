@@ -38,6 +38,7 @@ const extractJsonContent = (error, includeStackTrace) => {
  * @param {boolean} [options.showStackTrace] show stack trace in error output, default: false
  * @param {boolean} [options.showNonPublic] show underlying error embedded in non-public errors, default: false
  * @param {boolean} [options.includeRawError] include actual error object with no changes, default: false
+ * @param {Function} [options.onUnhandledError] call this function for any error without status attribute, default: null
  * @returns {Function} error handler suitable for placement on root application.
  */
 module.exports = (options) => {
@@ -51,6 +52,9 @@ module.exports = (options) => {
             status = err.status
             json = extractJsonContent(err, o.showStackTrace)
         } else {
+            if (options.onUnhandledError) {
+                options.onUnhandledError(err)
+            }
             status = 500
             json = { error: 'An internal server error occurred.' }
             if (o.showNonPublic) {

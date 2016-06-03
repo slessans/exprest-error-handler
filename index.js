@@ -52,8 +52,8 @@ module.exports = (options) => {
             status = err.status
             json = extractJsonContent(err, o.showStackTrace)
         } else {
-            if (options.onUnhandledError) {
-                options.onUnhandledError(err)
+            if (o.onUnhandledError) {
+                o.onUnhandledError(err)
             }
             status = 500
             json = { error: 'An internal server error occurred.' }

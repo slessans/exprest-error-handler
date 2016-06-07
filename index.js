@@ -1,9 +1,9 @@
 'use strict'
 
 const DEFAULTS = {
-    showStackTrace: false,
-    showNonPublic: false,
-    includeRawError: false,
+  showStackTrace: false,
+  showNonPublic: false,
+  includeRawError: false,
 }
 
 /**
@@ -14,21 +14,21 @@ const DEFAULTS = {
  * @returns {object} content
  */
 const extractJsonContent = (error, includeStackTrace) => {
-    const json = {
-        error: `${error.message}`,
+  const json = {
+    error: `${error.message}`,
+  }
+  if (error.jsonDetail) {
+    json.detail = error.jsonDetail
+  }
+  if (includeStackTrace && error.stack) {
+    const lines = error.stack.split('\n')
+    const reason = lines.shift()
+    json._stackTrace = {
+      reason,
+      at: lines.map((line) => line.trim()),
     }
-    if (error.jsonDetail) {
-        json.detail = error.jsonDetail
-    }
-    if (includeStackTrace && error.stack) {
-        const lines = error.stack.split('\n')
-        const reason = lines.shift()
-        json._stackTrace = {
-            reason,
-            at: lines.map((line) => line.trim()),
-        }
-    }
-    return json
+  }
+  return json
 }
 
 /**
@@ -42,32 +42,35 @@ const extractJsonContent = (error, includeStackTrace) => {
  * @returns {Function} error handler suitable for placement on root application.
  */
 module.exports = (options) => {
-    const o = Object.assign({}, DEFAULTS, options || {})
+  const o = Object.assign({}, DEFAULTS, options || {})
 
-    return (err, req, res, next) => {  // eslint-disable-line no-unused-vars
-        let json
-        let status
-        if (err.status) {
-            // this is an error that is ok to show to the public
-            status = err.status
-            json = extractJsonContent(err, o.showStackTrace)
-        } else {
-            if (o.onUnhandledError) {
-                o.onUnhandledError(err)
-            }
-            status = 500
-            json = { error: 'An internal server error occurred.' }
-            if (o.showNonPublic) {
-                json._underlyingError = extractJsonContent(err, o.showStackTrace)
-            }
-        }
-
-        if (o.includeRawError) {
-            json._rawUnderlyingError = err
-        }
-
-        res
-            .status(status)
-            .json(json)
+  return (err, req, res, next) => {
+    if (res.headersSent) {
+      return next(err)
     }
+    let json
+    let status
+    if (err.status) {
+      // this is an error that is ok to show to the public
+      status = err.status
+      json = extractJsonContent(err, o.showStackTrace)
+    } else {
+      if (o.onUnhandledError) {
+        o.onUnhandledError(err)
+      }
+      status = 500
+      json = { error: 'An internal server error occurred.' }
+      if (o.showNonPublic) {
+        json._underlyingError = extractJsonContent(err, o.showStackTrace)
+      }
+    }
+
+    if (o.includeRawError) {
+      json._rawUnderlyingError = err
+    }
+
+    res
+      .status(status)
+      .json(json)
+  }
 }
